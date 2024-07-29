@@ -46,6 +46,16 @@ const bookSchema = new Schema({
     maxlength: [500, "Description cannot exceed 500 characters"],
   },
   coverImage: {imageSchema},
+  borrowedBy:[{
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: "User"
+    },
+    borrowedDate:{
+        type: Date,
+        default: Date.now,
+    }
+  }]
 });
 
 export default mongoose.model("Book", bookSchema);
