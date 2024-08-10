@@ -2,10 +2,10 @@ import mongoose from "mongoose";
 
 const Schema = mongoose.Schema;
 
-const imageSchema = new Schema ({
-    url: String,
-    filename: String,
-})
+const imageSchema = new Schema({
+  url: String,
+  filename: String,
+});
 
 const bookSchema = new Schema({
   title: {
@@ -45,17 +45,19 @@ const bookSchema = new Schema({
     trim: true,
     maxlength: [500, "Description cannot exceed 500 characters"],
   },
-  coverImage: {imageSchema},
-  borrowedBy:[{
-    userId: {
+  coverImage: { imageSchema },
+  borrowedBy: [
+    {
+      userId: {
         type: Schema.Types.ObjectId,
-        ref: "User"
-    },
-    borrowedDate:{
+        ref: "User",
+      },
+      borrowedDate: {
         type: Date,
         default: Date.now,
-    }
-  }]
+      },
+    },
+  ],
 });
 
 export default mongoose.model("Book", bookSchema);
