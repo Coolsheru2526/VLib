@@ -43,4 +43,13 @@ export const getAllBooks = catchAsyncErrors(async (req,res,err)=>{
     });
 })
 
-// export const deleteBookById = catchAsyncErrors(async (req,res,nec))
+export const deleteBookById = catchAsyncErrors(async (req,res,next)=>{
+    const book = await Book.findByIdAndDelete(req.body.isbn);
+    if(!book){
+        return next(new ErrorHandler("Book not found",404));
+    }
+    res.status(200).json({
+        success: true,
+        message: "Book deleted successfully"
+    });
+})

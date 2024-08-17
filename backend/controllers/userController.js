@@ -1,5 +1,8 @@
 import { catchAsyncErrors } from "../middlewares/CatchAsyncError.js";
+import ErrorHandler from "../middlewares/errorMiddleware.js";
 import { User } from "../models/userSchema.js";
+import { generateToken } from "../utils/jwtToken.js";
+
 
 export const userRegister = catchAsyncErrors(async (req,res,next) =>{
     const{

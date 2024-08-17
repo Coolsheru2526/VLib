@@ -23,9 +23,6 @@ app.use(express.urlencoded({ extended: true }));
 
 dbConnection();
 
-app.get('/', function (req, res) {
-    res.send('Welcome to VLIB!');
-});
 
 app.use("/api/user",userRoute)
 app.use("/api/books", books);

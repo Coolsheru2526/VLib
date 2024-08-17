@@ -25,6 +25,12 @@ const bookSchema = new Schema({
     type: String,
     required: [true, "ISBN is required"],
     unique: true,
+    validate: {
+      validator: function(v) {
+        return /^(?:\d{9}[\dXx]|\d{13})$/.test(v);
+      },
+      message: props => `${props.value} is not a valid ISBN number!`
+    }
   },
   publishedDate: {
     type: Date,
@@ -50,7 +56,6 @@ const bookSchema = new Schema({
       userId: {
         type: Schema.Types.ObjectId,
         ref: "User",
-        default: null,
       },
       borrowedDate: {
         type: Date,
@@ -60,4 +65,4 @@ const bookSchema = new Schema({
   ],
 });
 
-export default mongoose.model("Book", bookSchema);
+export const Book = mongoose.model("Book", bookSchema);
