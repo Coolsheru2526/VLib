@@ -51,6 +51,10 @@ const userSchema = new mongoose.Schema({
         required:true,
         enum:["Admin","Student"]
     },
+    image:{
+        url: String,
+        filename: String,
+    },
     booksBorrowed:[{booksId:{type:mongoose.Schema.Types.ObjectId, ref: "Book"},date:{type:Date,default:Date.now()}}]
 });
 
