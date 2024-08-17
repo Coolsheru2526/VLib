@@ -44,12 +44,13 @@ const bookSchema = new Schema({
     trim: true,
     maxlength: [500, "Description cannot exceed 500 characters"],
   },
-  coverImage: { imageSchema },
+  // coverImage: { imageSchema },
   borrowedBy: [
     {
       userId: {
         type: Schema.Types.ObjectId,
         ref: "User",
+        default: null,
       },
       borrowedDate: {
         type: Date,
