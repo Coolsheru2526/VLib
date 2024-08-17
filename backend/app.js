@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { dbConnection } from "./db/dbConnection.js";
 import books from "./routers/books.js";
+import auth from "./routers/auth.js";
 
 const app = express();
 config({ path: "./config/config.env" });
@@ -26,6 +27,8 @@ app.get('/', function (req, res) {
     res.send('Welcome to VLIB!');
 });
 
+
+app.use("/api/auth", auth)
 app.use("/api/books", books);
 
 export default app;
