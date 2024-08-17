@@ -51,27 +51,27 @@ const userSchema = new mongoose.Schema({
         required:true,
         enum:["Admin","Student"]
     },
-    image:{
-        url: String,
-        filename: String,
-    },
+    // image:{
+    //     url: String,
+    //     filename: String,
+    // },
     booksBorrowed:[{booksId:{type:mongoose.Schema.Types.ObjectId, ref: "Book"},date:{type:Date,default:Date.now()}}]
 });
 
-// userSchema.pre("save",async function(next){
-//     if(!this.isModified("password")){
-//         next();
-//     }
-//     this.password = await bcrypt.hash(this.password,10);
-// });
+userSchema.pre("save",async function(next){
+    if(!this.isModified("password")){
+        next();
+    }
+    this.password = await bcrypt.hash(this.password,10);
+});
 
-// userSchema.methods.comparePassword = async function(enteredPassword){
-//     return await bcrypt.compare(enteredPassword,this.password);
-// }
+userSchema.methods.comparePassword = async function(enteredPassword){
+    return await bcrypt.compare(enteredPassword,this.password);
+}
 
-// userSchema.methods.generateJsonWebToken= function(){
-//     return jwt.sign({id:this._id},process.env.JWT_SECRET_KEY,{expiresIn:process.env.JWT_EXPIRES});
-// }
+userSchema.methods.generateJsonWebToken= function(){
+    return jwt.sign({id:this._id},process.env.JWT_SECRET_KEY,{expiresIn:process.env.JWT_EXPIRES});
+}
 
 
 export const User = mongoose.model("User",userSchema);
