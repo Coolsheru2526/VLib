@@ -28,8 +28,6 @@ const userSchema = new mongoose.Schema({
     enrollmentNumber: {
         type: String,
         required: true,
-        minLength: [13, "Should have at least 13 characters"],
-        maxLength: [13, "Should have at least 13 characters"],
         validate: {
             validator: function (v) {
                 const pattern = /^BT22(CME|MEC|EEE|CSE|MIN|META)\d{6}$|^BT22ECE\d{3}$/;
