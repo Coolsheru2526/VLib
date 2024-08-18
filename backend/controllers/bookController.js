@@ -18,10 +18,10 @@ export const addNewBook = catchAsyncErrors(async (req, res, next) => {
         return next(new ErrorHandler("Please enter all details", 400));
     }
 
-    // let book = await Book.findOne({ isbn });
-    // if (book) {
-    //     return next(new ErrorHandler("Book already exists", 400));
-    // }
+    let book = await Book.findOne({ isbn });
+    if (book) {
+        return next(new ErrorHandler("Book already exists", 400));
+    }
 
     await Book.create({
         title,
@@ -32,7 +32,8 @@ export const addNewBook = catchAsyncErrors(async (req, res, next) => {
         copiesAvailable,
         description,
     });
-   return res.status(200).json({
+    
+    res.status(200).json({
         success: true,
         message: "Book added successfully",
     });
