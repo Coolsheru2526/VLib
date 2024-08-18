@@ -2,9 +2,65 @@ import { catchAsyncErrors } from "../middlewares/CatchAsyncError.js";
 import ErrorHandler from "../middlewares/errorMiddleware.js";
 import { Book} from "../models/bookSchema.js";
 import {User} from "../models/userSchema.js";
+import cloudinary from "cloudinary";
+
 
 // Add New Book
 export const addNewBook = catchAsyncErrors(async (req, res, next) => {
+  if(req.files){
+    const {coverImage} = req.files;
+    const allowedFormats = ["image/png","image/jpeg","image/webp"];
+    if(!allowedFormats.includes(docAvatar.mimetype)){
+        return next(new ErrorHandler("Invalid file format",400));
+    }
+    const {
+      title,
+      author,
+      isbn,
+      publishedDate,
+      genre,
+      copiesAvailable,
+      description,
+    } = req.body;
+  
+    if (
+      !author ||
+      !isbn ||
+      !title ||
+      !publishedDate ||
+      !genre ||
+      !copiesAvailable ||
+      !description
+    ) {
+      return next(new ErrorHandler("Please fill in all required fields", 400));
+    }
+  
+    let book = await Book.findOne({ isbn });
+    if (book) {
+      return next(new ErrorHandler("Book already exists", 400));
+    }
+    const cloudinaryResponse = await cloudinary.uploader.upload(
+      coverImage.tempfilepath
+    )
+    if(!cloudinaryResponse||cloudinaryResponse.error){
+        console.error("Cloudinary Error",cloudinaryResponse.error||"Invalid cloudinary response");
+    }
+  
+    const newBook = await Book.create({
+      title,
+      author,
+      isbn,
+      publishedDate,
+      genre,
+      copiesAvailable,
+      coverImage:cloudinaryResponse.secure_url,
+      description,
+    });
+    return res.status(200).json({
+      success: true,
+      message: "Book added successfully",
+    });
+  }
   const {
     title,
     author,
@@ -31,6 +87,7 @@ export const addNewBook = catchAsyncErrors(async (req, res, next) => {
   if (book) {
     return next(new ErrorHandler("Book already exists", 400));
   }
+
   const newBook = await Book.create({
     title,
     author,
@@ -71,44 +128,62 @@ export const deleteBookById = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-// borrow Book
-
 export const borrowBook = catchAsyncErrors(async (req, res, next) => {
-  const { isbn } = req.body;
-  console.log(req.user._id);
+  const { books } = req.body; // Expecting an array of { isbn, quantity } objects
   const userId = req.user._id;
-  
-  if (!isbn) {
-    return next(new ErrorHandler("ISBN is required", 400));
+
+  if (!books || books.length === 0) {
+    return next(new ErrorHandler("No books specified for borrowing", 400));
   }
 
-  const book = await Book.findOneAndUpdate(
-    { isbn, copiesAvailable: { $gt: 0 } }, 
-    { $inc: { copiesAvailable: -1 } },
-    { new: true }
-  );
+  // Initialize an array to hold the borrowed book details
+  let borrowedBooks = [];
 
-  if (!book) {
-    return next(new ErrorHandler("Book not found or no copies available", 404));
+  for (let book of books) {
+    const { isbn, quantity } = book;
+
+    if (!isbn || !quantity || quantity <= 0) {
+      return next(new ErrorHandler(`Invalid ISBN or quantity for book: ${isbn}`, 400));
+    }
+
+    // Find and update the book
+    const bookDoc = await Book.findOneAndUpdate(
+      { isbn, copiesAvailable: { $gte: quantity } },
+      { $inc: { copiesAvailable: -quantity } },
+      { new: true }
+    );
+
+    if (!bookDoc) {
+      return next(new ErrorHandler(`Book with ISBN ${isbn} not found or not enough copies available`, 404));
+    }
+
+    // Update the borrowedBy array for the book
+    await Book.findOneAndUpdate(
+      { _id: bookDoc._id },
+      { $push: { borrowedBy: { userId: userId, borrowedDate: new Date() } } },
+      { new: true }
+    );
+
+    // Update the user's borrowed books
+    await User.findByIdAndUpdate(
+      userId,
+      { $push: { booksBorrowed: { booksId: bookDoc._id, date: new Date() } } },
+      { new: true }
+    );
+
+    // Add to borrowedBooks array
+    borrowedBooks.push({
+      booksId: bookDoc._id,
+      title: bookDoc.title,
+      author: bookDoc.author,
+      quantity,
+      date: new Date()
+    });
   }
-
-  const user = await User.findByIdAndUpdate(userId, {$push: {
-        booksBorrowed: {
-          booksId: book._id,
-          date: new Date()
-        }
-      }
-  }, {new: true})
-
-  if(!user){
-    return next(new ErrorHandler("User not found", 404));
-  }
-
-  console.log(user);
 
   return res.status(200).json({
     success: true,
-    message: "Book borrowed successfully",
-    book,
+    message: "Books borrowed successfully",
+    borrowedBooks
   });
 });

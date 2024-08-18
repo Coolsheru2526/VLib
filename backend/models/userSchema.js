@@ -56,6 +56,10 @@ const userSchema = new mongoose.Schema({
         required: true,
         enum: ["Admin", "Student"]
     },
+    profilePicture: {
+        type: String,
+        default: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" // Use a full URL as default value
+    },
     booksBorrowed: [
         {
             booksId: { type: mongoose.Schema.Types.ObjectId, ref: "Book" },
@@ -63,6 +67,7 @@ const userSchema = new mongoose.Schema({
         }
     ]
 });
+
 
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) {

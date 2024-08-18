@@ -1,11 +1,6 @@
 import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
-const imageSchema = new Schema({
-  url: String,
-  filename: String,
-});
-
 const bookSchema = new Schema({
   title: {
     type: String,
@@ -50,7 +45,11 @@ const bookSchema = new Schema({
     trim: true,
     maxlength: [500, "Description cannot exceed 500 characters"],
   },
-  // coverImage: { imageSchema },
+  coverImage: {
+    type: String,
+    default:"https://thumbs.dreamstime.com/z/closed-book-cartoon-vector-symbol-icon-design-beautiful-illustr-illustration-isolated-white-background-97502521.jpg?ct=jpeg",
+
+  },
   borrowedBy: [
     {
       userId: {

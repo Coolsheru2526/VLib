@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 export const dbConnection = () => {
-    mongoose.connect("mongodb://localhost:27017/vlib",{
+    mongoose.connect(process.env.MONGO_URL,{
         dbName:"VLIB_DB"
     }).then(() => {
         console.log("Connected to DB");

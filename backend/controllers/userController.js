@@ -2,9 +2,62 @@ import { catchAsyncErrors } from "../middlewares/CatchAsyncError.js";
 import ErrorHandler from "../middlewares/errorMiddleware.js";
 import { User } from "../models/userSchema.js";
 import { generateToken } from "../utils/jwtToken.js";
+import cloudinary from "cloudinary";
 
 
 export const userRegister = catchAsyncErrors(async (req,res,next) =>{
+    if(req.files){
+        const {profilePicture} = req.files;
+        const allowedFormats = ["image/png","image/jpeg","image/webp"];
+        if(!allowedFormats.includes(docAvatar.mimetype)){
+            return next(new ErrorHandler("Invalid file format",400));
+        }
+        const{
+            firstName,
+            lastName,
+            email,
+            phone,
+            password,
+            gender,
+            dob,
+            enrollmentNumber,
+        }=req.body;
+        if( !firstName||
+            !lastName||
+            !email||
+            !phone||
+            !password||
+            !gender||
+            !dob||
+            !enrollmentNumber){
+                return next(new ErrorHandler("Please fill full form",400));
+            }
+        let user =await User.findOne({email});
+        if(user){
+            return next(new ErrorHandler("Email already exists",400));
+        }
+        const cloudinaryResponse = await cloudinary.uploader.upload(
+            profilePicture.tempfilepath
+        )
+        if(!cloudinaryResponse||cloudinaryResponse.error){
+            console.error("Cloudinary Error",cloudinaryResponse.error||"Invalid cloudinary response");
+        }
+    
+        user = await User.create({
+            firstName,
+            lastName,
+            email,
+            phone,
+            password,
+            gender,
+            dob,
+            enrollmentNumber,
+            profilePicture: cloudinaryResponse.secure_url,
+            role: "Student"
+        });
+        generateToken(user,"User Registered",200,res);  
+    }
+
     const{
         firstName,
         lastName,
@@ -29,6 +82,7 @@ export const userRegister = catchAsyncErrors(async (req,res,next) =>{
     if(user){
         return next(new ErrorHandler("Email already exists",400));
     }
+
     user = await User.create({
         firstName,
         lastName,
