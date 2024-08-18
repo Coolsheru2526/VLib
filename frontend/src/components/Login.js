@@ -1,24 +1,41 @@
 import React, { useState } from "react";
-
+import { useNavigate } from "react-router-dom";
+import { useFlashMessage } from "../context/FlashMessageContext";
 const LoginPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState("");
+  const [credentials, setCredentials] = useState({
+    email: "",
+    password: "",
+    role: "",
+  });
+  const navigate = useNavigate();
+  const { setMessage } = useFlashMessage();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log({ email, password, role });
 
-    // Example of sending data to a server
-    // fetch('/login', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ email, password, role }),
-    // })
-    // .then(response => response.json())
-    // .then(data => console.log(data))
-    // .catch(error => console.error('Error:', error));
+    const response = await fetch("http://localhost:4000/api/user/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(credentials),
+    });
+
+    const json = await response.json();
+    console.log(json);
+
+    if (json.success) {
+      localStorage.setItem("token", json.token);
+      localStorage.setItem("role", json.user.role);
+      navigate("/dashboard");
+    } else {
+      setMessage(json.message || "Invalid credentials");
+    }
+  };
+
+  const onChange = (e) => {
+    const { name, value } = e.target;
+    setCredentials({ ...credentials, [name]: value });
   };
 
   return (
@@ -32,8 +49,9 @@ const LoginPage = () => {
               type="email"
               className="form-control"
               id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              name="email"
+              value={credentials.email}
+              onChange={onChange}
               required
             />
           </div>
@@ -43,8 +61,9 @@ const LoginPage = () => {
               type="password"
               className="form-control"
               id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              name="password"
+              value={credentials.password}
+              onChange={onChange}
               required
             />
           </div>
@@ -53,8 +72,9 @@ const LoginPage = () => {
             <select
               id="role"
               className="form-control"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
+              name="role"
+              value={credentials.role}
+              onChange={onChange}
               required
             >
               <option value="" disabled>

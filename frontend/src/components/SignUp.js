@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useFlashMessage } from "../context/FlashMessageContext";
 
 const SignUp = () => {
-  const [formData, setFormData] = useState({
+  const [credentials, setCredentials] = useState({
     firstName: "",
     lastName: "",
     email: "",
@@ -12,15 +14,36 @@ const SignUp = () => {
     password: "",
     role: "",
   });
+  const navigate = useNavigate();
+  const { setMessage } = useFlashMessage();
 
-  const handleChange = (e) => {
+  const onChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setCredentials({ ...credentials, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const response = await fetch("http://localhost:4000/api/user/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(credentials),
+    })
+
+    const json = await response.json();
+
+    if(json.success){
+      localStorage.setItem("token", json.token);
+      localStorage.setItem("role", json.user.role);
+      setMessage(json.message, "success");
+      navigate("/dashboard");
+    }
+    else{
+      setMessage(json.message, "error");
+    }
   };
 
   return (
@@ -36,8 +59,8 @@ const SignUp = () => {
                 className="form-control"
                 id="firstName"
                 name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
+                value={credentials.firstName}
+                onChange={onChange}
                 required
               />
             </div>
@@ -48,8 +71,8 @@ const SignUp = () => {
                 className="form-control"
                 id="lastName"
                 name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
+                value={credentials.lastName}
+                onChange={onChange}
                 required
               />
             </div>
@@ -61,8 +84,8 @@ const SignUp = () => {
               className="form-control"
               id="email"
               name="email"
-              value={formData.email}
-              onChange={handleChange}
+              value={credentials.email}
+              onChange={onChange}
               required
             />
           </div>
@@ -73,8 +96,8 @@ const SignUp = () => {
               className="form-control"
               id="phone"
               name="phone"
-              value={formData.phone}
-              onChange={handleChange}
+              value={credentials.phone}
+              onChange={onChange}
               required
             />
           </div>
@@ -85,8 +108,8 @@ const SignUp = () => {
               className="form-control"
               id="enrollmentNumber"
               name="enrollmentNumber"
-              value={formData.enrollmentNumber}
-              onChange={handleChange}
+              value={credentials.enrollmentNumber}
+              onChange={onChange}
               required
             />
           </div>
@@ -97,8 +120,8 @@ const SignUp = () => {
               className="form-control"
               id="dob"
               name="dob"
-              value={formData.dob}
-              onChange={handleChange}
+              value={credentials.dob}
+              onChange={onChange}
               required
             />
           </div>
@@ -108,8 +131,8 @@ const SignUp = () => {
               id="gender"
               name="gender"
               className="form-control"
-              value={formData.gender}
-              onChange={handleChange}
+              value={credentials.gender}
+              onChange={onChange}
               required
             >
               <option value="" disabled>
@@ -126,8 +149,8 @@ const SignUp = () => {
               className="form-control"
               id="password"
               name="password"
-              value={formData.password}
-              onChange={handleChange}
+              value={credentials.password}
+              onChange={onChange}
               required
             />
           </div>
