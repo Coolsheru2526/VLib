@@ -38,7 +38,7 @@ export const userRegister = catchAsyncErrors(async (req,res,next) =>{
         gender,
         dob,
         enrollmentNumber,
-        role:"Student"
+        role: "Student"
     });
     generateToken(user,"User Registered",200,res);
 });
