@@ -2,7 +2,7 @@ import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useFlashMessage } from "../context/FlashMessageContext";
 
-const ProtectedRoute = ({ element }) => {
+const ProtectedRoute = ({ roleBasedRoutes }) => {
   const { setMessage } = useFlashMessage();
   const role = localStorage.getItem("role");
   const isLoggedIn = !!localStorage.getItem("token");
@@ -14,14 +14,15 @@ const ProtectedRoute = ({ element }) => {
   }
 
   if (role === "Admin") {
-    return <Navigate to="/dashboard/admin" replace />;
+    return roleBasedRoutes.admin;
   }
 
   if (role === "Student") {
-    return <Navigate to="/dashboard/student" replace />;
+    return roleBasedRoutes.student;
   }
 
-  return <Navigate to="/" />;
+  // If role does not match, redirect to login or another appropriate route
+  return <Navigate to="/login" state={{ from: location }} replace />;
 };
 
 export default ProtectedRoute;

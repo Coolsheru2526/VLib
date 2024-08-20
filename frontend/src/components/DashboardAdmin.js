@@ -1,8 +1,11 @@
 import React from 'react'
+import AddBook from './AddBook'
 
 const DashboardAdmin = () => {
   return (
-    <div>DashboardAdmin</div>
+    <div>
+      <AddBook/>
+    </div>
   )
 }
 

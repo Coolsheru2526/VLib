@@ -10,31 +10,36 @@ import DashboardAdmin from "./components/DashboardAdmin";
 import DashboardUser from "./components/DashboardUser";
 import { FlashMessageProvider } from "./context/FlashMessageContext";
 import FlashMessage from "./components/FlashMessage";
+import "bootstrap/dist/css/bootstrap.min.css";
+import BookState from "./context/books/BookState";
+
 
 function App() {
   return (
     <FlashMessageProvider>
-      <Router>
-        <Navbar />
-        <FlashMessage />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route
-            path="/dashboard/*"
-            element={
-              <ProtectedRoute
-                roleBasedRoutes={{
-                  admin: DashboardAdmin,
-                  student: DashboardUser,
-                }}
-              />
-            }
-          />
-        </Routes>
-      </Router>
+      <BookState>
+        <Router>
+          <Navbar />
+          <FlashMessage />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route
+              path="/dashboard/*"
+              element={
+                <ProtectedRoute
+                  roleBasedRoutes={{
+                    admin: <DashboardAdmin />,
+                    student: <DashboardUser />,
+                  }}
+                />
+              }
+            />
+          </Routes>
+        </Router>
+      </BookState>
     </FlashMessageProvider>
   );
 }
