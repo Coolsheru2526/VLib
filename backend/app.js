@@ -6,7 +6,6 @@ import { dbConnection } from "./db/dbConnection.js";
 import books from "./routers/bookRoute.js";
 import userRoute from "./routers/userRoute.js";
 import { errorMiddleware } from "./middlewares/errorMiddleware.js";
-import { errorMiddleware } from "./middlewares/errorMiddleware.js";
 
 const app = express();
 config({ path: "./config/config.env" });
