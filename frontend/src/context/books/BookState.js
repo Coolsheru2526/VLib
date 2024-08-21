@@ -1,49 +1,53 @@
-import React, {useState} from 'react'
-import BookContext from './BookContext'
+import React, { useState } from 'react';
+import BookContext from './BookContext';
 import { useFlashMessage } from '../FlashMessageContext';
 
 const BookState = (props) => {
-  // const host = "http://localhost:4000";
   const initialBooks = [];
   const [books, setBooks] = useState(initialBooks);
-  const {setMessage} = useFlashMessage();
+  const { setMessage } = useFlashMessage();
 
   const addBook = async (bookDetails, bookCover) => {
-    const {title, author, isbn, genre, publicationYear, copiesAvailable, description} = bookDetails;
+    const { title, author, isbn, genre, publicationYear, copiesAvailable, description } = bookDetails;
     const token = localStorage.getItem('token');
-    console.log(bookDetails);
-    console.log(token);
-    
+
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('author', author);
+    formData.append('isbn', isbn);
+    formData.append('genre', JSON.stringify(genre.split(','))); // Convert genre to an array
+    formData.append('publicationYear', publicationYear);
+    formData.append('copiesAvailable', copiesAvailable);
+    formData.append('description', description);
+    if (bookCover) {
+      formData.append('coverImage', bookCover); // Append cover image if available
+    }
 
     const response = await fetch(`http://localhost:4000/api/books/addBook`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
       },
       credentials: 'include',
-      body: JSON.stringify({
-        title,
-        author,
-        isbn,
-        genre,
-        publicationYear,
-        copiesAvailable,
-        description,
-      }),
+      body: formData
     });
 
     const json = await response.json();
-    console.log(json)
+    console.log(json);
 
     if (json.success) {
       setBooks([...books, json.book]);
-      setMessage(json.message, "success");
+      setMessage(json.message, 'success');
     } else {
-      setMessage(json.message, "error");
+      setMessage(json.message, 'error');
     }
-  }
+  };
 
-  return <BookContext.Provider value={{books, addBook}}>{props.children}</BookContext.Provider>;
+  return (
+    <BookContext.Provider value={{ books, addBook }}>
+      {props.children}
+    </BookContext.Provider>
+  );
 };
 
-export default BookState
+export default BookState;

@@ -1,20 +1,21 @@
-import React, { useState, useContext } from "react";
-import { Form, Button, Col, Row, Container } from "react-bootstrap";
-import BookContext from "../context/books/BookContext";
+import React, { useState, useContext } from 'react';
+import { Form, Button, Col, Row, Container } from 'react-bootstrap';
+import BookContext from '../context/books/BookContext';
+
 const AddBook = () => {
   const context = useContext(BookContext);
   const { addBook } = context;
 
   const [book, setBook] = useState({
-    title: "addsfasdf",
-    author: "adsfsa",
-    isbn: "9780222033447",
-    genre: "computer science",
-    publicationYear: "",
-    copiesAvailable: "",
-    description: "dfgsdgsdfgsdfgdsfgdfgsdfgsdfgsdfgsdfgsdfgsdf",
+    title: '',
+    author: '',
+    isbn: '',
+    genre: '', // Genre as a comma-separated string
+    publicationYear: '',
+    copiesAvailable: '',
+    description: '',
   });
-  const [coverImage, setCoverImage] = useState("");
+  const [coverImage, setCoverImage] = useState(null);
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
@@ -27,31 +28,30 @@ const AddBook = () => {
   };
 
   const handleFileChange = (e) => {
-    // setCoverImage(e.target.files[0]);
+    setCoverImage(e.target.files[0]);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    addBook(book);
+    addBook(book, coverImage);
     setBook({
-      title: "",
-      author: "",
-      isbn: "",
-      genre: "",
-      publicationYear: "",
-      copiesAvailable: "",
-      description: "",
-    })
+      title: '',
+      author: '',
+      isbn: '',
+      genre: '',
+      publicationYear: '',
+      copiesAvailable: '',
+      description: '',
+    });
     setCoverImage(null);
   };
 
   return (
     <Container className="d-flex justify-content-center align-items-center vh-100">
-      <div className="card p-4" style={{ width: "100%", maxWidth: "800px" }}>
+      <div className="card p-4" style={{ width: '100%', maxWidth: '800px' }}>
         <h2 className="text-center mb-4">Add a New Book</h2>
         <Form onSubmit={handleSubmit}>
-          <Form.Group as={Row} controlId="formTitle">
+        <Form.Group as={Row} controlId="formTitle">
             <Form.Label column sm={4}>
               Title:
             </Form.Label>
@@ -141,7 +141,7 @@ const AddBook = () => {
                 value={book.genre}
                 onChange={handleChange}
                 isInvalid={!!errors.genre}
-                placeholder="Enter book genre"
+                placeholder="Enter book genres separated by commas"
                 required
               />
               <Form.Control.Feedback type="invalid">
@@ -189,6 +189,7 @@ const AddBook = () => {
               </Form.Control.Feedback>
             </Col>
           </Form.Group>
+
 
           <Form.Group as={Row} controlId="formCoverImage">
             <Form.Label column sm={4}>
