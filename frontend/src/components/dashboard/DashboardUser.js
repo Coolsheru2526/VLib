@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import BookContext from "../context/books/BookContext";
+import BookContext from "../../context/books/BookContext";
 
 const DashboardUser = () => {
   const { books, fetchBooks, borrowBook } = useContext(BookContext);
@@ -18,8 +18,8 @@ const DashboardUser = () => {
         setLoading(false);
       }
     };
-
     loadBooks();
+    // eslint-disable-next-line
   }, []);
 
   // Function to handle adding books to the borrowed list
@@ -47,7 +47,7 @@ const DashboardUser = () => {
       alert("Please add at least one book to borrow.");
     }
   };
-  console.log(borrowedBooks);
+  console.log(typeof(borrowedBooks));
   return (
     <div className="container mt-4">
       <h2 className="mb-4">Books List</h2>

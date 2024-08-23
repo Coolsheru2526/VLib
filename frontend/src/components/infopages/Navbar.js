@@ -68,6 +68,18 @@ const Navbar = () => {
                   </Link>
                 </li>
               )}
+              {isLoggedIn && userRole === "Admin" && (
+                <li className="nav-item">
+                  <Link
+                    className={`nav-link ${
+                      location.pathname === "/addBook" ? "active" : ""
+                    }`}
+                    to="/addBook"
+                  >
+                    Add 
+                  </Link>
+                </li>
+              )}
             </ul>
             <form className="d-flex">
               {!isLoggedIn ? (

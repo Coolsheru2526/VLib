@@ -1,17 +1,20 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Navbar from "./components/Navbar";
+import Navbar from "./components/infopages/Navbar";
 import Home from "./components/home/Home";
-import About from "./components/About";
-import SignUp from "./components/SignUp";
-import Login from "./components/Login";
+import About from "./components/infopages/About";
+import SignUp from "./components/auth/SignUp";
+import Login from "./components/auth/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
-import DashboardAdmin from "./components/DashboardAdmin";
-import DashboardUser from "./components/DashboardUser";
+import DashboardAdmin from "./components/dashboard/DashboardAdmin";
+import DashboardUser from "./components/dashboard/DashboardUser";
 import { FlashMessageProvider } from "./context/FlashMessageContext";
 import FlashMessage from "./components/FlashMessage";
 import "bootstrap/dist/css/bootstrap.min.css";
 import BookState from "./context/books/BookState";
+import ShowBook from "./components/book/ShowBook";
+import BorrowBook from "./components/book/BorrowBook";
+import AddBook from "./components/book/AddBook";
 
 
 function App() {
@@ -37,7 +40,36 @@ function App() {
                 />
               }
             />
-
+            <Route
+              path="/allBooks"
+              element={
+                <ProtectedRoute
+                  roleBasedRoutes={{
+                    student: <ShowBook />,
+                  }}
+                />
+              }
+            />
+            <Route
+              path="/borrowBooks"
+              element={
+                <ProtectedRoute
+                  roleBasedRoutes={{
+                    student: <BorrowBook />,
+                  }}
+                />
+              }
+            />
+            <Route
+              path="/addBook"
+              element={
+                <ProtectedRoute
+                  roleBasedRoutes={{
+                    admin: <AddBook/>
+                  }}
+                />
+              }
+            />
           </Routes>
         </Router>
       </BookState>

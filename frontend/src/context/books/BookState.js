@@ -3,19 +3,7 @@ import BookContext from "./BookContext";
 import { useFlashMessage } from "../FlashMessageContext";
 
 const BookState = (props) => {
-  const initialBooks = [
-    {
-      title: "The Great Gatsby",
-      author: "F. Scott Fitzgerald",
-      isbn: "978-0743273565",
-      genre: "Fiction",
-      publishedDate: "April 10, 1925",
-      copiesAvailable: 10,
-      description:
-        "A novel set in the Jazz Age that critiques the American Dream.",
-      coverImage: "", // Replace with a valid image URL
-    },
-  ];
+  const initialBooks = [];
   const [books, setBooks] = useState(initialBooks);
   const { setMessage } = useFlashMessage();
 
@@ -88,8 +76,8 @@ const BookState = (props) => {
       headers: {
         "Content-Type": "application/json",
       },
-      content:"include",
-      body: JSON.stringify(book),
+      credentials:"include",
+      body: JSON.stringify({book}),
     }
     )
     const json = await response.json();

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useFlashMessage } from "../context/FlashMessageContext";
+import { useFlashMessage } from "../../context/FlashMessageContext";
 const LoginPage = () => {
   const [credentials, setCredentials] = useState({
     email: "",
