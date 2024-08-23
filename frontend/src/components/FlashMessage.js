@@ -1,4 +1,3 @@
-// components/FlashMessage.js
 import React from "react";
 import { useFlashMessage } from "../context/FlashMessageContext"; // Adjust the path if necessary
 

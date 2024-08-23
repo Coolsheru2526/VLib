@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
 import BookContext from "../context/books/BookContext";
-import Book from "./Book";
 
 const DashboardUser = () => {
-  const { books, fetchBooks } = useContext(BookContext);
+  const { books, fetchBooks, borrowBook } = useContext(BookContext);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [borrowedBooks, setBorrowedBooks] = useState([]);
 
   // Fetch books when the component mounts
   useEffect(() => {
@@ -22,6 +22,32 @@ const DashboardUser = () => {
     loadBooks();
   }, []);
 
+  // Function to handle adding books to the borrowed list
+  const handleAddBook = (isbn) => {
+    setBorrowedBooks((prev) => {
+      const bookIndex = prev.findIndex((book) => book.isbn === isbn);
+      if (bookIndex > -1) {
+        // Increase the quantity of the book if it's already in the borrowed list
+        const updatedBooks = [...prev];
+        updatedBooks[bookIndex].quantity += 1;
+        return updatedBooks;
+      } else {
+        // Add the book to the borrowed list with quantity 1
+        return [...prev, { isbn, quantity: 1 }];
+      }
+    });
+  };
+
+  // Function to handle borrowing the books
+  const handleBorrowBooks = () => {
+    if (borrowedBooks.length > 0) {
+      borrowBook(borrowedBooks);
+      setBorrowedBooks([]); // Clear the borrowed list after borrowing
+    } else {
+      alert("Please add at least one book to borrow.");
+    }
+  };
+  console.log(borrowedBooks);
   return (
     <div className="container mt-4">
       <h2 className="mb-4">Books List</h2>
@@ -64,7 +90,7 @@ const DashboardUser = () => {
                     <strong>ISBN:</strong> {book.isbn}
                   </p>
                   <p className="card-text">
-                    <strong>Genre:</strong> {book.genre}
+                    <strong>Genre:</strong> {book.genre.join(", ")}
                   </p>
                   <p className="card-text">
                     <strong>Published Date:</strong> {book.publishedDate}
@@ -75,12 +101,39 @@ const DashboardUser = () => {
                   <p className="card-text">
                     <strong>Description:</strong> {book.description}
                   </p>
+                  <button
+                    className="btn btn-success"
+                    onClick={() => handleAddBook(book.isbn)}
+                  >
+                    Add Book
+                  </button>
                 </div>
               </div>
             </div>
           ))}
         </div>
       )}
+      <div className="mt-4">
+        <h4>Borrowed Books</h4>
+        {borrowedBooks.length === 0 ? (
+          <p>No books selected for borrowing.</p>
+        ) : (
+          <ul>
+            {borrowedBooks.map((book) => (
+              <li key={book.isbn}>
+                ISBN: {book.isbn} - Quantity: {book.quantity}
+              </li>
+            ))}
+          </ul>
+        )}
+        <button
+          type="submit"
+          className="btn btn-primary btn-block my-3"
+          onClick={handleBorrowBooks}
+        >
+          Borrow Books
+        </button>
+      </div>
     </div>
   );
 };

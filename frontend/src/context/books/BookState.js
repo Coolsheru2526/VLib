@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import BookContext from "./BookContext";
 import { useFlashMessage } from "../FlashMessageContext";
-// import axios from "axios";
 
 const BookState = (props) => {
   const initialBooks = [
@@ -82,9 +81,27 @@ const BookState = (props) => {
       setMessage(json.message, "error");
     }
   };
-
+  
+  const borrowBook = async (book)=>{
+    const response = await fetch("http://localhost:4000/api/books/borrowBook",{
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      content:"include",
+      body: JSON.stringify(book),
+    }
+    )
+    const json = await response.json();
+    console.log(json);
+    if(json.success){
+      setMessage(json.message);
+    }else{
+      setMessage(json.message);
+    }
+  }
   return (
-    <BookContext.Provider value={{ books, addBook, fetchBooks }}>
+    <BookContext.Provider value={{ books, addBook, fetchBooks, borrowBook }}>
       {props.children}
     </BookContext.Provider>
   );

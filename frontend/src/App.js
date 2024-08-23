@@ -12,8 +12,6 @@ import { FlashMessageProvider } from "./context/FlashMessageContext";
 import FlashMessage from "./components/FlashMessage";
 import "bootstrap/dist/css/bootstrap.min.css";
 import BookState from "./context/books/BookState";
-import ShowBook from "./components/ShowBook";
-import BorrowBook from "./components/BorrowBook";
 
 
 function App() {
@@ -39,26 +37,7 @@ function App() {
                 />
               }
             />
-            <Route
-              path="/allBooks"
-              element={
-                <ProtectedRoute
-                  roleBasedRoutes={{
-                    student: <ShowBook />,
-                  }}
-                />
-              }
-            />
-            <Route
-              path="/borrowBooks"
-              element={
-                <ProtectedRoute
-                  roleBasedRoutes={{
-                    student: <BorrowBook />,
-                  }}
-                />
-              }
-            />
+
           </Routes>
         </Router>
       </BookState>
