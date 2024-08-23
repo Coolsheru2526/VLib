@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import BookContext from './BookContext';
-import { useFlashMessage } from '../FlashMessageContext';
+import React, { useState } from "react";
+import BookContext from "./BookContext";
+import { useFlashMessage } from "../FlashMessageContext";
 
 const BookState = (props) => {
   const initialBooks = [];
@@ -8,28 +8,42 @@ const BookState = (props) => {
   const { setMessage } = useFlashMessage();
 
   const addBook = async (bookDetails, bookCover) => {
-    const { title, author, isbn, genre, publicationYear, copiesAvailable, description } = bookDetails;
-    const token = localStorage.getItem('token');
-
+    const {
+      title,
+      author,
+      isbn,
+      publishedDate,
+      genre,
+      copiesAvailable,
+      description,
+    } = bookDetails;
+    const token = localStorage.getItem("token");
+    console.log(token);
+    console.log(bookDetails);
+    // console.log(bookCover);
+    // console.log(bookCover.mimetype);
+    // Create a new FormData object
     const formData = new FormData();
-    formData.append('title', title);
-    formData.append('author', author);
-    formData.append('isbn', isbn);
-    formData.append('genre', JSON.stringify(genre.split(','))); // Convert genre to an array
-    formData.append('publicationYear', publicationYear);
-    formData.append('copiesAvailable', copiesAvailable);
-    formData.append('description', description);
+    formData.append("title", title);
+    formData.append("author", author);
+    formData.append("isbn", isbn);
+    formData.append("publishedDate", publishedDate);
+    formData.append("genre", JSON.stringify(genre)); // Convert genre array to string
+    formData.append("copiesAvailable", copiesAvailable);
+    formData.append("description", description);
+
+    // Append the book cover image to the form data, or use default URL if no image is provided
     if (bookCover) {
-      formData.append('coverImage', bookCover); // Append cover image if available
+      formData.append("coverImage", bookCover);
     }
 
     const response = await fetch(`http://localhost:4000/api/books/addBook`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`
+        "Content-Type": "multipart/form-data"
       },
-      credentials: 'include',
-      body: formData
+      credentials: "include",
+      body: formData, // Use FormData as the body
     });
 
     const json = await response.json();
@@ -42,7 +56,6 @@ const BookState = (props) => {
       setMessage(json.message, 'error');
     }
   };
-
   return (
     <BookContext.Provider value={{ books, addBook }}>
       {props.children}

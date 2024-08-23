@@ -1,21 +1,22 @@
-import React, { useState, useContext } from 'react';
-import { Form, Button, Col, Row, Container } from 'react-bootstrap';
-import BookContext from '../context/books/BookContext';
+import React, { useState, useContext } from "react";
+import { Form, Button, Col, Row, Container } from "react-bootstrap";
+import BookContext from "../context/books/BookContext";
 
 const AddBook = () => {
   const context = useContext(BookContext);
   const { addBook } = context;
 
   const [book, setBook] = useState({
-    title: '',
-    author: '',
-    isbn: '',
-    genre: '', // Genre as a comma-separated string
-    publicationYear: '',
-    copiesAvailable: '',
-    description: '',
+    title: "",
+    author: "",
+    isbn: "",
+    genre: "",
+    publishedDate: "",
+    copiesAvailable: 0,
+    description: "",
   });
-  const [coverImage, setCoverImage] = useState(null);
+
+  const [coverImage, setCoverImage] = useState(null); // Handle a single file
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
@@ -28,20 +29,26 @@ const AddBook = () => {
   };
 
   const handleFileChange = (e) => {
-    setCoverImage(e.target.files[0]);
+    setCoverImage(e.target.files[0]); // Handle single file selection
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    addBook(book, coverImage);
+
+    const bookDetails = {
+      ...book,
+      genre: book.genre.split(",").map((g) => g.trim()), // Convert genre string to array
+    };
+
+    addBook(bookDetails, coverImage);
     setBook({
-      title: '',
-      author: '',
-      isbn: '',
-      genre: '',
-      publicationYear: '',
-      copiesAvailable: '',
-      description: '',
+      title: "",
+      author: "",
+      isbn: "",
+      genre: "",
+      publishedDate: "",
+      copiesAvailable: 0,
+      description: "",
     });
     setCoverImage(null);
   };
@@ -111,21 +118,21 @@ const AddBook = () => {
             </Col>
           </Form.Group>
 
-          <Form.Group as={Row} controlId="formPublicationYear">
+          <Form.Group as={Row} controlId="formPublishedDate">
             <Form.Label column sm={4}>
               Published Date:
             </Form.Label>
             <Col sm={8}>
               <Form.Control
                 type="date"
-                name="publicationYear"
-                value={book.publicationYear}
+                name="publishedDate"
+                value={book.publishedDate}
                 onChange={handleChange}
-                isInvalid={!!errors.publicationYear}
+                isInvalid={!!errors.publishedDate}
                 required
               />
               <Form.Control.Feedback type="invalid">
-                {errors.publicationYear}
+                {errors.publishedDate}
               </Form.Control.Feedback>
             </Col>
           </Form.Group>
@@ -141,7 +148,7 @@ const AddBook = () => {
                 value={book.genre}
                 onChange={handleChange}
                 isInvalid={!!errors.genre}
-                placeholder="Enter book genres separated by commas"
+                placeholder="Enter book genre (comma-separated)"
                 required
               />
               <Form.Control.Feedback type="invalid">

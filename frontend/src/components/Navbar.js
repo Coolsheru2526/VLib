@@ -5,11 +5,13 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const isLoggedIn = !!localStorage.getItem("token"); 
+  const isLoggedIn = !!localStorage.getItem("token");
+  const userRole = localStorage.getItem("role"); // Assuming role is stored in localStorage
 
   // Handle logout
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("role"); // Clear role on logout
     navigate("/login");
   };
 
@@ -54,6 +56,18 @@ const Navbar = () => {
                   About
                 </Link>
               </li>
+              {isLoggedIn && userRole && (
+                <li className="nav-item">
+                  <Link
+                    className={`nav-link ${
+                      location.pathname.startsWith("/dashboard") ? "active" : ""
+                    }`}
+                    to={`/dashboard/${userRole}`}
+                  >
+                    Dashboard
+                  </Link>
+                </li>
+              )}
             </ul>
             <form className="d-flex">
               {!isLoggedIn ? (

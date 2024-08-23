@@ -48,7 +48,6 @@ const bookSchema = new Schema({
   coverImage: {
     type: String,
     default:"https://thumbs.dreamstime.com/z/closed-book-cartoon-vector-symbol-icon-design-beautiful-illustr-illustration-isolated-white-background-97502521.jpg?ct=jpeg",
-
   },
   borrowedBy: [
     {
