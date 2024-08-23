@@ -1,18 +1,11 @@
 import { catchAsyncErrors } from "../middlewares/CatchAsyncError.js";
 import ErrorHandler from "../middlewares/errorMiddleware.js";
-import { Book} from "../models/bookSchema.js";
-import {User} from "../models/userSchema.js";
+import { Book } from "../models/bookSchema.js";
+import { User } from "../models/userSchema.js";
 import cloudinary from "cloudinary";
-
 
 // Add New Book
 export const addNewBook = catchAsyncErrors(async (req, res, next) => {
-  if(req.files){
-    const {coverImage} = req.files;
-    const allowedFormats = ["image/png","image/jpeg","image/webp"];
-    if(!allowedFormats.includes(docAvatar.mimetype)){
-        return next(new ErrorHandler("Invalid file format",400));
-    }
     const {
       title,
       author,
@@ -22,7 +15,15 @@ export const addNewBook = catchAsyncErrors(async (req, res, next) => {
       copiesAvailable,
       description,
     } = req.body;
-  
+    console.log(req.body);
+    console.log(req.files);
+  if (req.files) {
+    const { coverImage } = req.files;
+    const allowedFormats = ["image/png", "image/jpeg", "image/webp", "image/jpg"];
+    if (!allowedFormats.includes(coverImage.mimetype)) {
+      return next(new ErrorHandler("Invalid file format", 400));
+    }
+
     if (
       !author ||
       !isbn ||
@@ -32,20 +33,23 @@ export const addNewBook = catchAsyncErrors(async (req, res, next) => {
       !copiesAvailable ||
       !description
     ) {
-      return next(new ErrorHandler("Please fill in all required fields", 400));
+      return next(new ErrorHandler("Please fill in all required fields 11", 400));
     }
-  
+
     let book = await Book.findOne({ isbn });
     if (book) {
       return next(new ErrorHandler("Book already exists", 400));
     }
     const cloudinaryResponse = await cloudinary.uploader.upload(
-      coverImage.tempfilepath
-    )
-    if(!cloudinaryResponse||cloudinaryResponse.error){
-        console.error("Cloudinary Error",cloudinaryResponse.error||"Invalid cloudinary response");
+      coverImage.tempFilePath
+    );
+    if (!cloudinaryResponse || cloudinaryResponse.error) {
+      console.error(
+        "Cloudinary Error",
+        cloudinaryResponse.error || "Invalid cloudinary response"
+      );
     }
-  
+
     const newBook = await Book.create({
       title,
       author,
@@ -53,7 +57,39 @@ export const addNewBook = catchAsyncErrors(async (req, res, next) => {
       publishedDate,
       genre,
       copiesAvailable,
-      coverImage:cloudinaryResponse.secure_url,
+      coverImage: cloudinaryResponse.secure_url,
+      description,
+    });
+    return res.status(200).json({
+      success: true,
+      message: "Book added successfully",
+    });
+  } 
+  else {
+    if (
+      !author ||
+      !isbn ||
+      !title ||
+      !publishedDate ||
+      !genre ||
+      !copiesAvailable ||
+      !description
+    ) {
+      return next(new ErrorHandler("Please fill in all required fields 22", 400));
+    }
+
+    let book = await Book.findOne({ isbn });
+    if (book) {
+      return next(new ErrorHandler("Book already exists", 400));
+    }
+
+    const newBook = await Book.create({
+      title,
+      author,
+      isbn,
+      publishedDate,
+      genre,
+      copiesAvailable,
       description,
     });
     return res.status(200).json({
@@ -61,47 +97,6 @@ export const addNewBook = catchAsyncErrors(async (req, res, next) => {
       message: "Book added successfully",
     });
   }
-  const {
-    title,
-    author,
-    isbn,
-    publishedDate,
-    genre,
-    copiesAvailable,
-    description,
-  } = req.body;
-
-  if (
-    !author ||
-    !isbn ||
-    !title ||
-    !publishedDate ||
-    !genre ||
-    !copiesAvailable ||
-    !description
-  ) {
-    return next(new ErrorHandler("Please fill in all required fields", 400));
-  }
-
-  let book = await Book.findOne({ isbn });
-  if (book) {
-    return next(new ErrorHandler("Book already exists", 400));
-  }
-
-  const newBook = await Book.create({
-    title,
-    author,
-    isbn,
-    publishedDate,
-    genre,
-    copiesAvailable,
-    description,
-  });
-  return res.status(200).json({
-    success: true,
-    message: "Book added successfully",
-  });
-  
 });
 
 // Get All Books
@@ -113,9 +108,8 @@ export const getAllBooks = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-
 export const deleteBookById = catchAsyncErrors(async (req, res, next) => {
-  const { isbn } = req.body; 
+  const { isbn } = req.body;
   const book = await Book.findOneAndDelete({ isbn });
 
   if (!book) {
@@ -143,7 +137,9 @@ export const borrowBook = catchAsyncErrors(async (req, res, next) => {
     const { isbn, quantity } = book;
 
     if (!isbn || !quantity || quantity <= 0) {
-      return next(new ErrorHandler(`Invalid ISBN or quantity for book: ${isbn}`, 400));
+      return next(
+        new ErrorHandler(`Invalid ISBN or quantity for book: ${isbn}`, 400)
+      );
     }
 
     // Find and update the book
@@ -154,7 +150,12 @@ export const borrowBook = catchAsyncErrors(async (req, res, next) => {
     );
 
     if (!bookDoc) {
-      return next(new ErrorHandler(`Book with ISBN ${isbn} not found or not enough copies available`, 404));
+      return next(
+        new ErrorHandler(
+          `Book with ISBN ${isbn} not found or not enough copies available`,
+          404
+        )
+      );
     }
 
     // Update the borrowedBy array for the book
@@ -177,13 +178,13 @@ export const borrowBook = catchAsyncErrors(async (req, res, next) => {
       title: bookDoc.title,
       author: bookDoc.author,
       quantity,
-      date: new Date()
+      date: new Date(),
     });
   }
 
   return res.status(200).json({
     success: true,
     message: "Books borrowed successfully",
-    borrowedBooks
+    borrowedBooks,
   });
 });

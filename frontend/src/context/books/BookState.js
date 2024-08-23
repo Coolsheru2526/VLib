@@ -1,11 +1,41 @@
 import React, { useState } from "react";
 import BookContext from "./BookContext";
 import { useFlashMessage } from "../FlashMessageContext";
+// import axios from "axios";
 
 const BookState = (props) => {
-  const initialBooks = [];
+  const initialBooks = [
+    {
+      title: "The Great Gatsby",
+      author: "F. Scott Fitzgerald",
+      isbn: "978-0743273565",
+      genre: "Fiction",
+      publishedDate: "April 10, 1925",
+      copiesAvailable: 10,
+      description:
+        "A novel set in the Jazz Age that critiques the American Dream.",
+      coverImage: "", // Replace with a valid image URL
+    },
+  ];
   const [books, setBooks] = useState(initialBooks);
   const { setMessage } = useFlashMessage();
+
+  const fetchBooks = async () => {
+    try {
+      const response = await fetch("http://localhost:4000/api/books/getBooks", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const json = await response.json();
+      setBooks(json.books);
+    } catch (error) {
+      console.error("Error fetching books:", error);
+      setMessage("Error fetching books.", "error");
+    }
+  };
 
   const addBook = async (bookDetails, bookCover) => {
     const {
@@ -20,8 +50,7 @@ const BookState = (props) => {
     const token = localStorage.getItem("token");
     console.log(token);
     console.log(bookDetails);
-    // console.log(bookCover);
-    // console.log(bookCover.mimetype);
+    console.log(bookCover);
     // Create a new FormData object
     const formData = new FormData();
     formData.append("title", title);
@@ -37,13 +66,10 @@ const BookState = (props) => {
       formData.append("coverImage", bookCover);
     }
 
-    const response = await fetch(`http://localhost:4000/api/books/addBook`, {
-      method: 'POST',
-      headers: {
-        "Content-Type": "multipart/form-data"
-      },
+    const response = await fetch("http://localhost:4000/api/books/addBook", {
+      method: "POST",
       credentials: "include",
-      body: formData, // Use FormData as the body
+      body: formData,
     });
 
     const json = await response.json();
@@ -51,13 +77,14 @@ const BookState = (props) => {
 
     if (json.success) {
       setBooks([...books, json.book]);
-      setMessage(json.message, 'success');
+      setMessage(json.message, "success");
     } else {
-      setMessage(json.message, 'error');
+      setMessage(json.message, "error");
     }
   };
+
   return (
-    <BookContext.Provider value={{ books, addBook }}>
+    <BookContext.Provider value={{ books, addBook, fetchBooks }}>
       {props.children}
     </BookContext.Provider>
   );
