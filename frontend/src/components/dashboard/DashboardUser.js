@@ -1,14 +1,18 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import BookContext from "../../context/books/BookContext";
 
 const DashboardUser = () => {
-  const { books, fetchBooks, borrowBook } = useContext(BookContext);
+  const { books, fetchBooks } = useContext(BookContext);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [borrowedBooks, setBorrowedBooks] = useState([]);
-  const [borrowed, setBorrowed] = useState(false)
+  const [borrowedBooks, setBorrowedBooks] = useState(() => {
+    // Retrieve the borrowed books from localStorage when the component mounts
+    const storedBooks = localStorage.getItem("borrowedBooks");
+    return storedBooks ? JSON.parse(storedBooks) : [];
+  });
+  const navigate = useNavigate();
 
-  // Fetch books when the component mounts
   useEffect(() => {
     const loadBooks = async () => {
       try {
@@ -19,39 +23,27 @@ const DashboardUser = () => {
         setLoading(false);
       }
     };
-    console.log('HI')
     loadBooks();
-    fetchBooks();
-    
     // eslint-disable-next-line
-  }, [borrowed]);
+  },[]);
+  
 
-  // Function to handle adding books to the borrowed list
+  // Function to handle adding books to the borrowed list and storing them in localStorage
   const handleAddBook = (isbn) => {
-    setBorrowedBooks((prev) => {
-      const bookIndex = prev.findIndex((book) => book.isbn === isbn);
-      if (bookIndex > -1) {
-        // Increase the quantity of the book if it's already in the borrowed list
-        const updatedBooks = [...prev];
-        updatedBooks[bookIndex].quantity += 1;
-        return updatedBooks;
-      } else {
-        // Add the book to the borrowed list with quantity 1
-        return [...prev, { isbn, quantity: 1 }];
-      }
-    });
+    const updatedBorrowedBooks = [...borrowedBooks];
+    const bookIndex = updatedBorrowedBooks.findIndex((book) => book.isbn === isbn);
+
+    if (bookIndex > -1) {
+      updatedBorrowedBooks[bookIndex].quantity += 1;
+    } else {
+      updatedBorrowedBooks.push({ isbn, quantity: 1 });
+    }
+
+    setBorrowedBooks(updatedBorrowedBooks);
+    // Store the updated borrowed books in localStorage
+    localStorage.setItem("borrowedBooks", JSON.stringify(updatedBorrowedBooks));
   };
 
-  // Function to handle borrowing the books
-  const handleBorrowBooks = () => {
-    if (borrowedBooks.length > 0) {
-      borrowBook(borrowedBooks);
-      setBorrowedBooks([]); // Clear the borrowed list after borrowing
-      setBorrowed((prevBorrowed) => !prevBorrowed);
-    } else {
-      alert("Please add at least one book to borrow.");
-    }
-  };
   return (
     <div className="container mt-4">
       <h2 className="mb-4">Books List</h2>
@@ -97,9 +89,6 @@ const DashboardUser = () => {
                     <strong>Genre:</strong> {book.genre.join(", ")}
                   </p>
                   <p className="card-text">
-                    <strong>Published Date:</strong> {book.publishedDate}
-                  </p>
-                  <p className="card-text">
                     <strong>Copies Available:</strong> {book.copiesAvailable}
                   </p>
                   <p className="card-text">
@@ -117,27 +106,12 @@ const DashboardUser = () => {
           ))}
         </div>
       )}
-      <div className="mt-4">
-        <h4>Borrowed Books</h4>
-        {borrowedBooks.length === 0 ? (
-          <p>No books selected for borrowing.</p>
-        ) : (
-          <ul>
-            {borrowedBooks.map((book) => (
-              <li key={book.isbn}>
-                ISBN: {book.isbn} - Quantity: {book.quantity}
-              </li>
-            ))}
-          </ul>
-        )}
-        <button
-          type="submit"
-          className="btn btn-primary btn-block my-3"
-          onClick={handleBorrowBooks}
-        >
-          Borrow Books
-        </button>
-      </div>
+      <button
+        className="btn btn-primary mt-3"
+        onClick={() => navigate("/borrowBooks")}
+      >
+        See Borrowed Books
+      </button>
     </div>
   );
 };

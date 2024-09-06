@@ -12,7 +12,6 @@ import { FlashMessageProvider } from "./context/FlashMessageContext";
 import FlashMessage from "./components/FlashMessage";
 import "bootstrap/dist/css/bootstrap.min.css";
 import BookState from "./context/books/BookState";
-import ShowBook from "./components/book/ShowBook";
 import BorrowBook from "./components/book/BorrowBook";
 import AddBook from "./components/book/AddBook";
 
@@ -40,16 +39,7 @@ function App() {
                 />
               }
             />
-            <Route
-              path="/allBooks"
-              element={
-                <ProtectedRoute
-                  roleBasedRoutes={{
-                    student: <ShowBook />,
-                  }}
-                />
-              }
-            />
+
             <Route
               path="/borrowBooks"
               element={
