@@ -6,6 +6,7 @@ const DashboardUser = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [borrowedBooks, setBorrowedBooks] = useState([]);
+  const [borrowed, setBorrowed] = useState(false)
 
   // Fetch books when the component mounts
   useEffect(() => {
@@ -18,9 +19,12 @@ const DashboardUser = () => {
         setLoading(false);
       }
     };
+    console.log('HI')
     loadBooks();
+    fetchBooks();
+    
     // eslint-disable-next-line
-  }, []);
+  }, [borrowed]);
 
   // Function to handle adding books to the borrowed list
   const handleAddBook = (isbn) => {
@@ -43,11 +47,11 @@ const DashboardUser = () => {
     if (borrowedBooks.length > 0) {
       borrowBook(borrowedBooks);
       setBorrowedBooks([]); // Clear the borrowed list after borrowing
+      setBorrowed((prevBorrowed) => !prevBorrowed);
     } else {
       alert("Please add at least one book to borrow.");
     }
   };
-  console.log(typeof(borrowedBooks));
   return (
     <div className="container mt-4">
       <h2 className="mb-4">Books List</h2>

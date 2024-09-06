@@ -70,24 +70,26 @@ const BookState = (props) => {
     }
   };
   
-  const borrowBook = async (book)=>{
-    const response = await fetch("http://localhost:4000/api/books/borrowBook",{
+  const borrowBook = async (borrowedBooks) => {
+    const response = await fetch("http://localhost:4000/api/books/borrowBook", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      credentials:"include",
-      body: JSON.stringify({book}),
-    }
-    )
+      credentials: "include",
+      body: JSON.stringify({ books: borrowedBooks }),  // Wrap borrowedBooks in an object with the key "books"
+    });
+  
     const json = await response.json();
     console.log(json);
-    if(json.success){
-      setMessage(json.message);
-    }else{
-      setMessage(json.message);
+  
+    if (json.success) {
+      setMessage(json.message, "success");
+    } else {
+      setMessage(json.message, "error");
     }
-  }
+  };
+  
   return (
     <BookContext.Provider value={{ books, addBook, fetchBooks, borrowBook }}>
       {props.children}
